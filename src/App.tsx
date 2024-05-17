@@ -20,7 +20,7 @@ import {
   Tooltip,
   TableSortLabel,
 } from "@mui/material";
-import { Done, Clear, Edit, Add } from "@mui/icons-material";
+import { Done, Clear, Edit, Add, FilterList } from "@mui/icons-material";
 import theme from "./theme";
 import { format } from "date-fns";
 import OrderForm from "./OrderForm";
@@ -30,8 +30,12 @@ const App: React.FC = () => {
   const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentOrder, setCurrentOrder] = useState<DataItem | null>(null);
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = useState<keyof DataItem>("date_of_order");
+  const [filterFinished, setFilterFinished] = useState<boolean | null>(null);
+  const [filterPaymentReceived, setFilterPaymentReceived] = useState<
+    boolean | null
+  >(null);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
@@ -100,21 +104,52 @@ const App: React.FC = () => {
   };
 
   const handleRequestSort = (property: keyof DataItem) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+    if (property === "finished") {
+      setFilterFinished((prev) =>
+        prev === null ? true : prev === true ? false : null
+      );
+    } else if (property === "payment_received") {
+      setFilterPaymentReceived((prev) =>
+        prev === null ? true : prev === true ? false : null
+      );
+    } else {
+      const isAsc = orderBy === property && order === "asc";
+      setOrder(isAsc ? "desc" : "asc");
+      setOrderBy(property);
+    }
+  };
+
+  const filteredData = () => {
+    return data.filter((item) => {
+      if (filterFinished !== null && item.finished !== filterFinished)
+        return false;
+      if (
+        filterPaymentReceived !== null &&
+        item.payment_received !== filterPaymentReceived
+      )
+        return false;
+      return true;
+    });
   };
 
   const sortedData = () => {
-    return data.slice().sort((a, b) => {
-      if (b[orderBy] < a[orderBy]) {
-        return order === "asc" ? -1 : 1;
-      }
-      if (b[orderBy] > a[orderBy]) {
-        return order === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
+    return filteredData()
+      .slice()
+      .sort((a, b) => {
+        if (b[orderBy] < a[orderBy]) {
+          return order === "asc" ? -1 : 1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+          return order === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+  };
+
+  const getFilterIcon = (filter: boolean | null) => {
+    if (filter === true) return <Done />;
+    if (filter === false) return <Clear />;
+    return <FilterList />;
   };
 
   return (
@@ -122,7 +157,7 @@ const App: React.FC = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Mask Orders
+            EquineInhaler
           </Typography>
           <Tooltip title="Add Order">
             <IconButton color="inherit" onClick={handleAdd}>
@@ -261,24 +296,30 @@ const App: React.FC = () => {
                       </TableCell>
                       <TableCell>Description</TableCell>
                       <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "finished"}
-                          direction={orderBy === "finished" ? order : "asc"}
-                          onClick={() => handleRequestSort("finished")}
-                        >
-                          Finished
-                        </TableSortLabel>
+                        <Tooltip title="Filter by Finished">
+                          <Box sx={{ display: " flex", flexDirection: "row" }}>
+                            <Typography sx={{ pt: 1 }}>Printed</Typography>
+                            <IconButton
+                              onClick={() => handleRequestSort("finished")}
+                            >
+                              {getFilterIcon(filterFinished)}
+                            </IconButton>
+                          </Box>
+                        </Tooltip>
                       </TableCell>
                       <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "payment_received"}
-                          direction={
-                            orderBy === "payment_received" ? order : "asc"
-                          }
-                          onClick={() => handleRequestSort("payment_received")}
-                        >
-                          Payment Received
-                        </TableSortLabel>
+                        <Tooltip title="Filter by Payment Received">
+                          <Box sx={{ display: " flex", flexDirection: "row" }}>
+                            <Typography sx={{ pt: 1 }}>Paid</Typography>
+                            <IconButton
+                              onClick={() =>
+                                handleRequestSort("payment_received")
+                              }
+                            >
+                              {getFilterIcon(filterPaymentReceived)}
+                            </IconButton>
+                          </Box>
+                        </Tooltip>
                       </TableCell>
                       <TableCell>Edit</TableCell>
                     </TableRow>

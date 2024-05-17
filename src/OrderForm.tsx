@@ -58,7 +58,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const [formState, setFormState] = useState<DataItem>(initialState);
 
   const [open, setOpen] = useState(false);
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   useEffect(() => {
     if (order) {
