@@ -23,7 +23,7 @@ import {
   CheckBox,
 } from "@mui/icons-material";
 import { format } from "date-fns";
-import { DataItem } from "./types";
+import { DataItem } from "../types";
 
 interface OrderTableProps {
   data: DataItem[];

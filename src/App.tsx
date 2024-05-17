@@ -1,4 +1,4 @@
-// App.tsx
+// src/App.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -13,14 +13,18 @@ import {
   Fab,
   useMediaQuery,
   ThemeProvider,
+  Button,
 } from "@mui/material";
 import { Add, FilterList } from "@mui/icons-material";
+import { Link, Route, Routes } from "react-router-dom";
 import theme from "./theme";
-import OrderForm from "./OrderForm";
+import OrderForm from "./components/OrderForm";
+import OrderCard from "./components/OrderCard";
+import FilterSortModal from "./components/FilterSortModal";
+import OrderTable from "./components/OrderTable";
+import ColourTable from "./components/ColourTable";
+import FilamentTable from "./components/FilamentTable";
 import { DataItem } from "./types";
-import OrderCard from "./OrderCard";
-import FilterSortModal from "./FilterSortModal";
-import OrderTable from "./OrderTable";
 
 const App: React.FC = () => {
   const [data, setData] = useState<DataItem[]>([]);
@@ -36,6 +40,8 @@ const App: React.FC = () => {
     useState<boolean>(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -43,7 +49,7 @@ const App: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://192.168.1.88:5001/api/data");
+      const response = await axios.get(`${apiUrl}/data`);
       setData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -94,7 +100,7 @@ const App: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://192.168.1.88:5001/api/data/${id}`);
+      await axios.delete(`${apiUrl}/data/${id}`);
       fetchData(); // Refresh data after deletion
     } catch (error) {
       console.error("Error deleting order:", error);
@@ -151,6 +157,12 @@ const App: React.FC = () => {
               <Add />
             </IconButton>
           </Tooltip>
+          <Button component={Link} to="/colours" color="inherit">
+            Manage Colours
+          </Button>
+          <Button component={Link} to="/filaments" color="inherit">
+            Manage Filaments
+          </Button>
         </Toolbar>
       </AppBar>
       <Container
@@ -164,66 +176,79 @@ const App: React.FC = () => {
           pb: 5,
         }}
       >
-        {currentOrder ? (
-          <OrderForm
-            order={currentOrder}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            onDelete={handleDelete}
-          />
-        ) : (
-          <>
-            {loading ? (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="50vh"
-              >
-                <CircularProgress />
-              </Box>
-            ) : isMobile ? (
-              <>
-                {sortedData().map((item) => (
-                  <OrderCard key={item.id} item={item} onEdit={handleEdit} />
-                ))}
-                <Fab
-                  color="primary"
-                  aria-label="filter"
-                  sx={{ position: "fixed", bottom: 16, right: 16 }}
-                  onClick={() => setFilterSortModalOpen(true)}
-                >
-                  <FilterList />
-                </Fab>
-                <FilterSortModal
-                  open={filterSortModalOpen}
-                  onClose={() => setFilterSortModalOpen(false)}
-                  filterFinished={filterFinished}
-                  filterPaymentReceived={filterPaymentReceived}
-                  setFilterFinished={setFilterFinished}
-                  setFilterPaymentReceived={setFilterPaymentReceived}
-                  orderBy={orderBy}
-                  setOrderBy={setOrderBy}
-                  order={order}
-                  setOrder={setOrder}
-                  clearFilters={clearFilters}
+        <Routes>
+          <Route path="/colours" element={<ColourTable />} />
+          <Route path="/filaments" element={<FilamentTable />} />
+          <Route
+            path="/"
+            element={
+              currentOrder ? (
+                <OrderForm
+                  order={currentOrder}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                  onDelete={handleDelete}
                 />
-              </>
-            ) : (
-              <OrderTable
-                data={sortedData()}
-                orderBy={orderBy}
-                order={order}
-                handleRequestSort={handleRequestSort}
-                handleEdit={handleEdit}
-                filterFinished={filterFinished}
-                setFilterFinished={setFilterFinished}
-                filterPaymentReceived={filterPaymentReceived}
-                setFilterPaymentReceived={setFilterPaymentReceived}
-              />
-            )}
-          </>
-        )}
+              ) : (
+                <>
+                  {loading ? (
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      height="50vh"
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : isMobile ? (
+                    <>
+                      {sortedData().map((item) => (
+                        <OrderCard
+                          key={item.id}
+                          item={item}
+                          onEdit={handleEdit}
+                        />
+                      ))}
+                      <Fab
+                        color="primary"
+                        aria-label="filter"
+                        sx={{ position: "fixed", bottom: 16, right: 16 }}
+                        onClick={() => setFilterSortModalOpen(true)}
+                      >
+                        <FilterList />
+                      </Fab>
+                      <FilterSortModal
+                        open={filterSortModalOpen}
+                        onClose={() => setFilterSortModalOpen(false)}
+                        filterFinished={filterFinished}
+                        filterPaymentReceived={filterPaymentReceived}
+                        setFilterFinished={setFilterFinished}
+                        setFilterPaymentReceived={setFilterPaymentReceived}
+                        orderBy={orderBy}
+                        setOrderBy={setOrderBy}
+                        order={order}
+                        setOrder={setOrder}
+                        clearFilters={clearFilters}
+                      />
+                    </>
+                  ) : (
+                    <OrderTable
+                      data={sortedData()}
+                      orderBy={orderBy}
+                      order={order}
+                      handleRequestSort={handleRequestSort}
+                      handleEdit={handleEdit}
+                      filterFinished={filterFinished}
+                      setFilterFinished={setFilterFinished}
+                      filterPaymentReceived={filterPaymentReceived}
+                      setFilterPaymentReceived={setFilterPaymentReceived}
+                    />
+                  )}
+                </>
+              )
+            }
+          />
+        </Routes>
       </Container>
     </ThemeProvider>
   );

@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Done, Clear, Edit } from "@mui/icons-material";
 import { format } from "date-fns";
-import { DataItem } from "./types";
+import { DataItem } from "../types";
 
 interface OrderCardProps {
   item: DataItem;

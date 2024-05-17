@@ -18,10 +18,10 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { DataItem } from "./types";
+import { DataItem } from "../types";
 import { useMediaQuery } from "@mui/material";
-import theme from "./theme";
-import { colorOptions, paymentOptions } from "./options";
+import theme from "../theme";
+import { colorOptions, paymentOptions } from "../options";
 
 interface OrderFormProps {
   order?: DataItem;
@@ -88,6 +88,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
     }));
   };
 
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -101,14 +103,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
     try {
       if (updatedFormState.id === 0) {
-        const response = await axios.post(
-          "http://192.168.1.88:5001/api/data",
-          updatedFormState
-        );
+        const response = await axios.post(`${apiUrl}/data`, updatedFormState);
         onSave({ ...updatedFormState, id: response.data.id });
       } else {
         await axios.put(
-          `http://192.168.1.88:5001/api/data/${updatedFormState.id}`,
+          `${apiUrl}/data/${updatedFormState.id}`,
           updatedFormState
         );
         onSave(updatedFormState);

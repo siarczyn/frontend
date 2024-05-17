@@ -12,7 +12,7 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { DataItem } from "./types";
+import { DataItem } from "../types";
 
 interface FilterSortModalProps {
   open: boolean;
