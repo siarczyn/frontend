@@ -92,7 +92,6 @@ const ColourTable: React.FC = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Colour ID</TableCell>
             <TableCell>Colour Name</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
@@ -100,7 +99,6 @@ const ColourTable: React.FC = () => {
         <TableBody>
           {colours.map((colour) => (
             <TableRow key={colour.id}>
-              <TableCell>{colour.id}</TableCell>
               <TableCell>
                 {editColourId === colour.id ? (
                   <TextField
@@ -132,7 +130,7 @@ const ColourTable: React.FC = () => {
             </TableRow>
           ))}
           <TableRow>
-            <TableCell colSpan={2}>
+            <TableCell>
               <TextField
                 label="New Colour"
                 value={newColour}

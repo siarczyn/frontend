@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -15,7 +14,7 @@ import {
   ThemeProvider,
   Button,
 } from "@mui/material";
-import { Add, FilterList } from "@mui/icons-material";
+import { Add, FilterList, Palette, Category } from "@mui/icons-material";
 import { Link, Route, Routes } from "react-router-dom";
 import theme from "./theme";
 import OrderForm from "./components/OrderForm";
@@ -32,7 +31,7 @@ const App: React.FC = () => {
   const [currentOrder, setCurrentOrder] = useState<DataItem | null>(null);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [orderBy, setOrderBy] = useState<keyof DataItem>("date_of_order");
-  const [filterFinished, setFilterFinished] = useState<boolean | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [filterPaymentReceived, setFilterPaymentReceived] = useState<
     boolean | null
   >(null);
@@ -89,7 +88,7 @@ const App: React.FC = () => {
       payment_status: "",
       discount: 0,
       date_of_order: new Date().toJSON().slice(0, 10).replace(/-/g, "/"),
-      finished: false,
+      status: "Contact",
       payment_received: false,
       source_of_order: "",
       nickname: "",
@@ -114,14 +113,13 @@ const App: React.FC = () => {
   };
 
   const clearFilters = () => {
-    setFilterFinished(null);
+    setFilterStatus(null);
     setFilterPaymentReceived(null);
   };
 
   const filteredData = () => {
     return data.filter((item) => {
-      if (filterFinished !== null && item.finished !== filterFinished)
-        return false;
+      if (filterStatus !== null && item.status !== filterStatus) return false;
       if (
         filterPaymentReceived !== null &&
         item.payment_received !== filterPaymentReceived
@@ -149,20 +147,32 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            EquineInhaler
-          </Typography>
+          <Tooltip title="Home">
+            <Typography
+              variant="h6"
+              component={Link}
+              to="/"
+              sx={{ flexGrow: 1, textDecoration: "none", color: "inherit" }}
+            >
+              EquineInhaler
+            </Typography>
+          </Tooltip>
+          <Box sx={{ flexGrow: 1 }} />
+          <Tooltip title="Manage Colours">
+            <IconButton component={Link} to="/colours" color="inherit">
+              <Palette />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Manage Filaments">
+            <IconButton component={Link} to="/filaments" color="inherit">
+              <Category />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Add Order">
             <IconButton color="inherit" onClick={handleAdd}>
               <Add />
             </IconButton>
           </Tooltip>
-          <Button component={Link} to="/colours" color="inherit">
-            Manage Colours
-          </Button>
-          <Button component={Link} to="/filaments" color="inherit">
-            Manage Filaments
-          </Button>
         </Toolbar>
       </AppBar>
       <Container
@@ -220,9 +230,9 @@ const App: React.FC = () => {
                       <FilterSortModal
                         open={filterSortModalOpen}
                         onClose={() => setFilterSortModalOpen(false)}
-                        filterFinished={filterFinished}
+                        filterStatus={filterStatus}
                         filterPaymentReceived={filterPaymentReceived}
-                        setFilterFinished={setFilterFinished}
+                        setFilterStatus={setFilterStatus}
                         setFilterPaymentReceived={setFilterPaymentReceived}
                         orderBy={orderBy}
                         setOrderBy={setOrderBy}
@@ -238,8 +248,8 @@ const App: React.FC = () => {
                       order={order}
                       handleRequestSort={handleRequestSort}
                       handleEdit={handleEdit}
-                      filterFinished={filterFinished}
-                      setFilterFinished={setFilterFinished}
+                      filterStatus={filterStatus}
+                      setFilterStatus={setFilterStatus}
                       filterPaymentReceived={filterPaymentReceived}
                       setFilterPaymentReceived={setFilterPaymentReceived}
                     />

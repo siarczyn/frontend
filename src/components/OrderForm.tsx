@@ -6,22 +6,20 @@ import {
   Button,
   Typography,
   Box,
-  FormControlLabel,
-  Checkbox,
+  FormControl,
   Select,
   MenuItem,
   InputLabel,
-  FormControl,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  useMediaQuery,
 } from "@mui/material";
 import { DataItem } from "../types";
-import { useMediaQuery } from "@mui/material";
 import theme from "../theme";
-import { colorOptions, paymentOptions } from "../options";
+import { colorOptions, paymentOptions, statusOptions } from "../options";
 
 interface OrderFormProps {
   order?: DataItem;
@@ -44,10 +42,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
     color: "",
     entry: "",
     payment: "",
-    payment_status: "", // Default value for required field
+    payment_status: "",
     discount: 0,
-    date_of_order: new Date().toISOString().slice(0, 10), // Set current date
-    finished: false,
+    date_of_order: new Date().toISOString().slice(0, 10),
+    status: "Contact", // Default status
     payment_received: false,
     source_of_order: "",
     nickname: "",
@@ -56,7 +54,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
   };
 
   const [formState, setFormState] = useState<DataItem>(initialState);
-
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -93,7 +90,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Adjust the price by the discount
     const adjustedPrice = formState.price * (1 - formState.discount / 100);
 
     const updatedFormState = {
@@ -281,6 +277,30 @@ const OrderForm: React.FC<OrderFormProps> = ({
             onChange={handleChange}
             sx={{ flex: isMobile ? "1 1 100%" : "1 1 48%" }}
           />
+          <FormControl
+            fullWidth={isMobile}
+            margin="dense"
+            sx={{ flex: isMobile ? "1 1 100%" : "1 1 48%" }}
+          >
+            <InputLabel id="status-label">Status</InputLabel>
+            <Select
+              labelId="status-label"
+              name="status"
+              value={formState.status}
+              onChange={(e) =>
+                handleSelectChange(
+                  e as React.ChangeEvent<{ name?: string; value: unknown }>
+                )
+              }
+              label="Status"
+            >
+              {statusOptions.map((status: string) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             fullWidth
             margin="dense"
@@ -293,32 +313,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
             sx={{ flex: "1 1 100%" }}
           />
         </Box>
-        {formState.id !== 0 && (
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formState.finished}
-                  onChange={handleChange}
-                  name="finished"
-                />
-              }
-              label="Finished"
-              sx={{ flex: "1 1 auto" }}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formState.payment_received}
-                  onChange={handleChange}
-                  name="payment_received"
-                />
-              }
-              label="Payment Received"
-              sx={{ flex: "1 1 auto" }}
-            />
-          </Box>
-        )}
         <Box display="flex" justifyContent="space-between" mt={2}>
           <Button variant="contained" color="primary" type="submit">
             Save

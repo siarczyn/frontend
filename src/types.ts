@@ -9,7 +9,7 @@ export interface DataItem {
   payment_status: string;
   discount: number;
   date_of_order: string;
-  finished: boolean;
+  status: string;
   payment_received: boolean;
   source_of_order: string;
   nickname: string;

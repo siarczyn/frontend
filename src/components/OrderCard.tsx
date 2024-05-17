@@ -1,4 +1,3 @@
-// OrderCard.tsx
 import React from "react";
 import {
   Card,
@@ -50,12 +49,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ item, onEdit }) => {
           <strong>Payment:</strong> {item.payment}
         </Typography>
         <Typography variant="body1">
-          <strong>Finished:</strong>{" "}
-          {item.finished ? (
-            <Done color="primary" />
-          ) : (
-            <Clear color="secondary" />
-          )}
+          <strong>Status:</strong> {item.status}
         </Typography>
         <Typography variant="body1">
           <strong>Payment Received:</strong>{" "}

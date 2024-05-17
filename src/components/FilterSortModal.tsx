@@ -1,25 +1,22 @@
-// FilterSortModal.tsx
 import React from "react";
 import {
   Modal,
   Box,
   Button,
   Typography,
-  Checkbox,
-  FormControlLabel,
-  Select,
-  MenuItem,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { DataItem } from "../types";
 
 interface FilterSortModalProps {
   open: boolean;
   onClose: () => void;
-  filterFinished: boolean | null;
+  filterStatus: string | null;
   filterPaymentReceived: boolean | null;
-  setFilterFinished: (value: boolean | null) => void;
+  setFilterStatus: (value: string | null) => void;
   setFilterPaymentReceived: (value: boolean | null) => void;
   orderBy: keyof DataItem;
   setOrderBy: (value: keyof DataItem) => void;
@@ -31,9 +28,9 @@ interface FilterSortModalProps {
 const FilterSortModal: React.FC<FilterSortModalProps> = ({
   open,
   onClose,
-  filterFinished,
+  filterStatus,
   filterPaymentReceived,
-  setFilterFinished,
+  setFilterStatus,
   setFilterPaymentReceived,
   orderBy,
   setOrderBy,
@@ -41,15 +38,6 @@ const FilterSortModal: React.FC<FilterSortModalProps> = ({
   setOrder,
   clearFilters,
 }) => {
-  const handleFilterChange = (
-    filterSetter: (value: boolean | null) => void,
-    currentValue: boolean | null
-  ) => {
-    filterSetter(
-      currentValue === null ? true : currentValue === true ? false : null
-    );
-  };
-
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -67,35 +55,22 @@ const FilterSortModal: React.FC<FilterSortModalProps> = ({
         <Typography variant="h6" gutterBottom>
           Filter and Sort
         </Typography>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filterFinished === true}
-              indeterminate={filterFinished === false}
-              onChange={() =>
-                handleFilterChange(setFilterFinished, filterFinished)
-              }
-              color="primary"
-            />
-          }
-          label="Finished"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={filterPaymentReceived === true}
-              indeterminate={filterPaymentReceived === false}
-              onChange={() =>
-                handleFilterChange(
-                  setFilterPaymentReceived,
-                  filterPaymentReceived
-                )
-              }
-              color="primary"
-            />
-          }
-          label="Payment Received"
-        />
+        <FormControl fullWidth sx={{ mt: 2 }}>
+          <InputLabel id="status-label">Status</InputLabel>
+          <Select
+            labelId="status-label"
+            value={filterStatus || ""}
+            onChange={(e) => setFilterStatus(e.target.value || null)}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Contact">Contact</MenuItem>
+            <MenuItem value="Order">Order</MenuItem>
+            <MenuItem value="Printing">Printing</MenuItem>
+            <MenuItem value="Printed">Printed</MenuItem>
+            <MenuItem value="Finished">Finished</MenuItem>
+            <MenuItem value="Sent">Sent</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl fullWidth sx={{ mt: 2 }}>
           <InputLabel id="order-by-label">Order By</InputLabel>
           <Select
@@ -111,6 +86,7 @@ const FilterSortModal: React.FC<FilterSortModalProps> = ({
             <MenuItem value="price">Price</MenuItem>
             <MenuItem value="source_of_order">Order Source</MenuItem>
             <MenuItem value="payment">Payment</MenuItem>
+            <MenuItem value="status">Status</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth sx={{ mt: 2 }}>

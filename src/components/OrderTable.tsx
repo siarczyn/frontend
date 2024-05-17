@@ -1,4 +1,3 @@
-// OrderTable.tsx
 import React from "react";
 import {
   Table,
@@ -14,14 +13,7 @@ import {
   IconButton,
   Box,
 } from "@mui/material";
-import {
-  Done,
-  Clear,
-  Edit,
-  FilterList,
-  IndeterminateCheckBox,
-  CheckBox,
-} from "@mui/icons-material";
+import { Done, Clear, Edit, FilterList } from "@mui/icons-material";
 import { format } from "date-fns";
 import { DataItem } from "../types";
 
@@ -31,8 +23,8 @@ interface OrderTableProps {
   order: "asc" | "desc";
   handleRequestSort: (property: keyof DataItem) => void;
   handleEdit: (order: DataItem) => void;
-  filterFinished: boolean | null;
-  setFilterFinished: (value: boolean | null) => void;
+  filterStatus: string | null;
+  setFilterStatus: (value: string | null) => void;
   filterPaymentReceived: boolean | null;
   setFilterPaymentReceived: (value: boolean | null) => void;
 }
@@ -43,13 +35,13 @@ const OrderTable: React.FC<OrderTableProps> = ({
   order,
   handleRequestSort,
   handleEdit,
-  filterFinished,
-  setFilterFinished,
+  filterStatus,
+  setFilterStatus,
   filterPaymentReceived,
   setFilterPaymentReceived,
 }) => {
   const getFilterIcon = (filter: boolean | null) => {
-    if (filter === true) return <CheckBox />;
+    if (filter === true) return <Done />;
     if (filter === false) return <Clear />;
     return <FilterList />;
   };
@@ -162,20 +154,20 @@ const OrderTable: React.FC<OrderTableProps> = ({
             <TableCell>
               <Box display="flex" alignItems="center">
                 <TableSortLabel
-                  active={orderBy === "finished"}
-                  direction={orderBy === "finished" ? order : "asc"}
-                  onClick={() => handleRequestSort("finished")}
+                  active={orderBy === "status"}
+                  direction={orderBy === "status" ? order : "asc"}
+                  onClick={() => handleRequestSort("status")}
                 >
-                  Finished
+                  Status
                 </TableSortLabel>
                 <IconButton
                   onClick={() =>
-                    handleFilterToggle(filterFinished, setFilterFinished)
+                    setFilterStatus(filterStatus === null ? "" : null)
                   }
                   size="small"
                   sx={{ ml: 1 }}
                 >
-                  {getFilterIcon(filterFinished)}
+                  {getFilterIcon(filterStatus === null ? false : true)}
                 </IconButton>
               </Box>
             </TableCell>
@@ -246,13 +238,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
                 <Typography align="center">{item.payment}</Typography>
               </TableCell>
               <TableCell>
-                <Typography align="center">
-                  {item.finished ? (
-                    <Done color="primary" />
-                  ) : (
-                    <Clear color="secondary" />
-                  )}
-                </Typography>
+                <Typography align="center">{item.status}</Typography>
               </TableCell>
               <TableCell>
                 <Typography align="center">
@@ -281,13 +267,6 @@ const OrderTable: React.FC<OrderTableProps> = ({
                   </IconButton>
                 </Tooltip>
               </TableCell>
-              {/* <TableCell>
-                <Tooltip title="Delete">
-                  <IconButton onClick={() => handleDelete(item.id)}>
-                    <Clear />
-                  </IconButton>
-                </Tooltip>
-              </TableCell> */}
             </TableRow>
           ))}
         </TableBody>

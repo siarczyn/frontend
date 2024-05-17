@@ -43,6 +43,10 @@ const FilamentTable: React.FC = () => {
   useEffect(() => {
     fetchFilaments();
     fetchColours();
+    setNewFilament({
+      ...newFilament,
+      amount_used: 0,
+    });
   }, []);
 
   const fetchFilaments = async () => {
@@ -110,7 +114,6 @@ const FilamentTable: React.FC = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Filament ID</TableCell>
             <TableCell>Size</TableCell>
             <TableCell>Amount Used</TableCell>
             <TableCell>Date of Addition</TableCell>
@@ -122,7 +125,6 @@ const FilamentTable: React.FC = () => {
         <TableBody>
           {filaments.map((filament) => (
             <TableRow key={filament.id}>
-              <TableCell>{filament.id}</TableCell>
               <TableCell>
                 {editFilamentId === filament.id ? (
                   <TextField
@@ -222,7 +224,7 @@ const FilamentTable: React.FC = () => {
             </TableRow>
           ))}
           <TableRow>
-            <TableCell colSpan={2}>
+            <TableCell>
               <TextField
                 label="New Size"
                 value={newFilament.size || ""}
@@ -234,17 +236,11 @@ const FilamentTable: React.FC = () => {
                 }
               />
             </TableCell>
-            <TableCell colSpan={2}>
-              <TextField
-                label="New Amount Used"
-                value={newFilament.amount_used || ""}
-                onChange={(e) =>
-                  setNewFilament({
-                    ...newFilament,
-                    amount_used: parseFloat(e.target.value),
-                  })
-                }
-              />
+            <TableCell>
+              <div></div>
+            </TableCell>
+            <TableCell>
+              <div></div>
             </TableCell>
             <TableCell>
               <TextField
