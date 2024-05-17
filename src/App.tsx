@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -5,26 +6,21 @@ import {
   Toolbar,
   Typography,
   Container,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  useMediaQuery,
-  ThemeProvider,
   CircularProgress,
   Box,
   Tooltip,
-  TableSortLabel,
+  IconButton,
+  Fab,
+  useMediaQuery,
+  ThemeProvider,
 } from "@mui/material";
-import { Done, Clear, Edit, Add, FilterList } from "@mui/icons-material";
+import { Add, FilterList } from "@mui/icons-material";
 import theme from "./theme";
-import { format } from "date-fns";
 import OrderForm from "./OrderForm";
 import { DataItem } from "./types";
+import OrderCard from "./OrderCard";
+import FilterSortModal from "./FilterSortModal";
+import OrderTable from "./OrderTable";
 
 const App: React.FC = () => {
   const [data, setData] = useState<DataItem[]>([]);
@@ -36,6 +32,8 @@ const App: React.FC = () => {
   const [filterPaymentReceived, setFilterPaymentReceived] = useState<
     boolean | null
   >(null);
+  const [filterSortModalOpen, setFilterSortModalOpen] =
+    useState<boolean>(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
@@ -76,11 +74,11 @@ const App: React.FC = () => {
   const handleAdd = () => {
     setCurrentOrder({
       id: 0,
-      size_x: 0,
-      size_y: 0,
-      size_z: 0,
+      size_x: 23,
+      size_y: 17,
+      size_z: 14,
       color: "",
-      entry: "",
+      entry: "18 standard",
       payment: "",
       payment_status: "",
       discount: 0,
@@ -104,19 +102,14 @@ const App: React.FC = () => {
   };
 
   const handleRequestSort = (property: keyof DataItem) => {
-    if (property === "finished") {
-      setFilterFinished((prev) =>
-        prev === null ? true : prev === true ? false : null
-      );
-    } else if (property === "payment_received") {
-      setFilterPaymentReceived((prev) =>
-        prev === null ? true : prev === true ? false : null
-      );
-    } else {
-      const isAsc = orderBy === property && order === "asc";
-      setOrder(isAsc ? "desc" : "asc");
-      setOrderBy(property);
-    }
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const clearFilters = () => {
+    setFilterFinished(null);
+    setFilterPaymentReceived(null);
   };
 
   const filteredData = () => {
@@ -146,12 +139,6 @@ const App: React.FC = () => {
       });
   };
 
-  const getFilterIcon = (filter: boolean | null) => {
-    if (filter === true) return <Done />;
-    if (filter === false) return <Clear />;
-    return <FilterList />;
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <AppBar position="static">
@@ -170,8 +157,11 @@ const App: React.FC = () => {
         sx={{
           mt: 3,
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
           width: isMobile ? "95vw" : "100vw",
+          minHeight: "100vw",
+          pb: 5,
         }}
       >
         {currentOrder ? (
@@ -192,229 +182,45 @@ const App: React.FC = () => {
               >
                 <CircularProgress />
               </Box>
+            ) : isMobile ? (
+              <>
+                {sortedData().map((item) => (
+                  <OrderCard key={item.id} item={item} onEdit={handleEdit} />
+                ))}
+                <Fab
+                  color="primary"
+                  aria-label="filter"
+                  sx={{ position: "fixed", bottom: 16, right: 16 }}
+                  onClick={() => setFilterSortModalOpen(true)}
+                >
+                  <FilterList />
+                </Fab>
+                <FilterSortModal
+                  open={filterSortModalOpen}
+                  onClose={() => setFilterSortModalOpen(false)}
+                  filterFinished={filterFinished}
+                  filterPaymentReceived={filterPaymentReceived}
+                  setFilterFinished={setFilterFinished}
+                  setFilterPaymentReceived={setFilterPaymentReceived}
+                  orderBy={orderBy}
+                  setOrderBy={setOrderBy}
+                  order={order}
+                  setOrder={setOrder}
+                  clearFilters={clearFilters}
+                />
+              </>
             ) : (
-              <TableContainer
-                component={Paper}
-                sx={{
-                  width: isMobile ? "95%" : "100%",
-                  minWidth: {
-                    xs: "100%",
-                    sm: "1200px",
-                    md: "1200px",
-                    lg: "1400px",
-                  },
-                }}
-              >
-                <Table aria-label="mask orders table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "date_of_order"}
-                          direction={
-                            orderBy === "date_of_order" ? order : "asc"
-                          }
-                          onClick={() => handleRequestSort("date_of_order")}
-                        >
-                          Date of Order
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "nickname"}
-                          direction={orderBy === "nickname" ? order : "asc"}
-                          onClick={() => handleRequestSort("nickname")}
-                        >
-                          Nickname
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "color"}
-                          direction={orderBy === "color" ? order : "asc"}
-                          onClick={() => handleRequestSort("color")}
-                        >
-                          Color
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip
-                          title={
-                            <span>
-                              Width
-                              <br />
-                              Length <br /> Heigth
-                            </span>
-                          }
-                        >
-                          <TableSortLabel
-                            active={orderBy === "size_x"}
-                            direction={orderBy === "size_x" ? order : "asc"}
-                            onClick={() => handleRequestSort("size_x")}
-                          >
-                            Size
-                          </TableSortLabel>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "entry"}
-                          direction={orderBy === "entry" ? order : "asc"}
-                          onClick={() => handleRequestSort("entry")}
-                        >
-                          Entry
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "price"}
-                          direction={orderBy === "price" ? order : "asc"}
-                          onClick={() => handleRequestSort("price")}
-                        >
-                          Price
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "source_of_order"}
-                          direction={
-                            orderBy === "source_of_order" ? order : "asc"
-                          }
-                          onClick={() => handleRequestSort("source_of_order")}
-                        >
-                          Order Source
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>
-                        <TableSortLabel
-                          active={orderBy === "payment"}
-                          direction={orderBy === "payment" ? order : "asc"}
-                          onClick={() => handleRequestSort("payment")}
-                        >
-                          Payment
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell>Description</TableCell>
-                      <TableCell>
-                        <Tooltip title="Filter by Finished">
-                          <Box sx={{ display: " flex", flexDirection: "row" }}>
-                            <Typography sx={{ pt: 1 }}>Printed</Typography>
-                            <IconButton
-                              onClick={() => handleRequestSort("finished")}
-                            >
-                              {getFilterIcon(filterFinished)}
-                            </IconButton>
-                          </Box>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title="Filter by Payment Received">
-                          <Box sx={{ display: " flex", flexDirection: "row" }}>
-                            <Typography sx={{ pt: 1 }}>Paid</Typography>
-                            <IconButton
-                              onClick={() =>
-                                handleRequestSort("payment_received")
-                              }
-                            >
-                              {getFilterIcon(filterPaymentReceived)}
-                            </IconButton>
-                          </Box>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>Edit</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {sortedData().map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <Typography
-                            variant="subtitle1"
-                            sx={{ fontSize: "90%" }}
-                            noWrap
-                            align="center"
-                          >
-                            {format(new Date(item.date_of_order), "dd-MM-yyyy")}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography align="center">
-                            {item.nickname}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography align="center">{item.color}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography align="center">
-                            {item.size_x} <br /> {item.size_y}
-                            <br /> {item.size_z}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography align="center">{item.entry}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={`Discount: ${item.discount}%`}>
-                            <Typography>{item.price}</Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          <Typography align="center">
-                            {item.source_of_order}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography align="center">{item.payment}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={item.description}>
-                            <Typography
-                              variant="subtitle1"
-                              sx={{ fontSize: "70%" }}
-                              noWrap
-                            >
-                              {item.description}
-                            </Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          <IconButton>
-                            {item.finished ? (
-                              <Done color="primary" />
-                            ) : (
-                              <Clear color="secondary" />
-                            )}
-                          </IconButton>
-                        </TableCell>
-                        <TableCell>
-                          <IconButton>
-                            {item.payment_received ? (
-                              <Done color="primary" />
-                            ) : (
-                              <Clear color="secondary" />
-                            )}
-                          </IconButton>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title="Edit">
-                            <IconButton onClick={() => handleEdit(item)}>
-                              <Edit />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                        {/* <TableCell>
-                          <Tooltip title="Delete">
-                            <IconButton onClick={() => handleDelete(item.id)}>
-                              <Clear />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell> */}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <OrderTable
+                data={sortedData()}
+                orderBy={orderBy}
+                order={order}
+                handleRequestSort={handleRequestSort}
+                handleEdit={handleEdit}
+                filterFinished={filterFinished}
+                setFilterFinished={setFilterFinished}
+                filterPaymentReceived={filterPaymentReceived}
+                setFilterPaymentReceived={setFilterPaymentReceived}
+              />
             )}
           </>
         )}
