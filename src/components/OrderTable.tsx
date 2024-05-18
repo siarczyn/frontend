@@ -23,8 +23,7 @@ interface OrderTableProps {
   order: "asc" | "desc";
   handleRequestSort: (property: keyof DataItem) => void;
   handleEdit: (order: DataItem) => void;
-  filterStatus: string | null;
-  setFilterStatus: (value: string | null) => void;
+  setFilterStatusModalOpen: (value: boolean) => void;
   filterPaymentReceived: boolean | null;
   setFilterPaymentReceived: (value: boolean | null) => void;
 }
@@ -35,8 +34,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
   order,
   handleRequestSort,
   handleEdit,
-  filterStatus,
-  setFilterStatus,
+  setFilterStatusModalOpen,
   filterPaymentReceived,
   setFilterPaymentReceived,
 }) => {
@@ -161,13 +159,11 @@ const OrderTable: React.FC<OrderTableProps> = ({
                   Status
                 </TableSortLabel>
                 <IconButton
-                  onClick={() =>
-                    setFilterStatus(filterStatus === null ? "" : null)
-                  }
+                  onClick={() => setFilterStatusModalOpen(true)}
                   size="small"
                   sx={{ ml: 1 }}
                 >
-                  {getFilterIcon(filterStatus === null ? false : true)}
+                  <FilterList />
                 </IconButton>
               </Box>
             </TableCell>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   AppBar,
@@ -13,6 +14,11 @@ import {
   useMediaQuery,
   ThemeProvider,
   Button,
+  Modal,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Add, FilterList, Palette, Category } from "@mui/icons-material";
 import { Link, Route, Routes } from "react-router-dom";
@@ -37,13 +43,16 @@ const App: React.FC = () => {
   >(null);
   const [filterSortModalOpen, setFilterSortModalOpen] =
     useState<boolean>(false);
+  const [filterStatusModalOpen, setFilterStatusModalOpen] =
+    useState<boolean>(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [filterStatus]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -95,6 +104,7 @@ const App: React.FC = () => {
       description: "",
       price: 0,
     });
+    navigate("/"); // Navigate to the home page
   };
 
   const handleDelete = async (id: number) => {
@@ -119,7 +129,12 @@ const App: React.FC = () => {
 
   const filteredData = () => {
     return data.filter((item) => {
-      if (filterStatus !== null && item.status !== filterStatus) return false;
+      if (
+        filterStatus !== null &&
+        filterStatus !== "" &&
+        item.status !== filterStatus
+      )
+        return false;
       if (
         filterPaymentReceived !== null &&
         item.payment_received !== filterPaymentReceived
@@ -248,8 +263,7 @@ const App: React.FC = () => {
                       order={order}
                       handleRequestSort={handleRequestSort}
                       handleEdit={handleEdit}
-                      filterStatus={filterStatus}
-                      setFilterStatus={setFilterStatus}
+                      setFilterStatusModalOpen={setFilterStatusModalOpen}
                       filterPaymentReceived={filterPaymentReceived}
                       setFilterPaymentReceived={setFilterPaymentReceived}
                     />
@@ -259,6 +273,48 @@ const App: React.FC = () => {
             }
           />
         </Routes>
+        <Modal
+          open={filterStatusModalOpen}
+          onClose={() => setFilterStatusModalOpen(false)}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 300,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Filter by Status
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel id="status-filter-label">Status</InputLabel>
+              <Select
+                labelId="status-filter-label"
+                value={filterStatus || ""}
+                onChange={(e) => setFilterStatus(e.target.value as string)}
+              >
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Contact">Contact</MenuItem>
+                <MenuItem value="Order">Order</MenuItem>
+                <MenuItem value="Printing">Printing</MenuItem>
+                <MenuItem value="Printed">Printed</MenuItem>
+                <MenuItem value="Finished">Finished</MenuItem>
+                <MenuItem value="Sent">Sent</MenuItem>
+              </Select>
+            </FormControl>
+            <Box display="flex" justifyContent="space-between" mt={2}>
+              <Button onClick={() => setFilterStatusModalOpen(false)}>
+                Close
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </Container>
     </ThemeProvider>
   );
