@@ -1,8 +1,8 @@
 {
   "Contact": "#FFEBEE",
-  "Order": "#E8F5E9",
-  "Printing": "#FFFDE7",
-  "Printed": "#E3F2FD",
-  "Finished": "#F3E5F5",
-  "Sent": "#F9FBE7"
+  "Order": "#F3E5F5",
+  "Printing": "#E3F2FD",
+  "Printed": "#FFFDE7",
+  "Finished": "#F9FBE7",
+  "Sent": "#E8F5E9"
 }
