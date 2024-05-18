@@ -28,6 +28,15 @@ interface OrderTableProps {
   setFilterPaymentReceived: (value: boolean | null) => void;
 }
 
+const statusColor: { [key: string]: string } = {
+  Contact: "lightblue",
+  Order: "lightgreen",
+  Printing: "lightyellow",
+  Printed: "lightcoral",
+  Finished: "lightgray",
+  Sent: "lightsalmon",
+};
+
 const OrderTable: React.FC<OrderTableProps> = ({
   data,
   orderBy,
@@ -196,7 +205,10 @@ const OrderTable: React.FC<OrderTableProps> = ({
         </TableHead>
         <TableBody>
           {data.map((item) => (
-            <TableRow key={item.id}>
+            <TableRow
+              key={item.id}
+              sx={{ backgroundColor: statusColor[item.status] }}
+            >
               <TableCell>
                 <Typography
                   variant="subtitle1"
