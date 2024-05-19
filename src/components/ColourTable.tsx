@@ -81,7 +81,7 @@ const ColourTable: React.FC = () => {
   const handleDeleteColour = async (id: number) => {
     try {
       await axios.delete(`${apiUrl}/colours/${id}`);
-      setColours(colours.filter((colour) => colour.id !== id));
+      fetchColours(); // Refresh the data after setting active to false
     } catch (error) {
       console.error("Error deleting colour:", error);
     }

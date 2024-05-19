@@ -46,6 +46,7 @@ const FilamentTable: React.FC = () => {
     setNewFilament({
       ...newFilament,
       amount_used: 0,
+      date_of_addition: new Date().toISOString().split("T")[0],
     });
   }, []);
 
@@ -103,7 +104,7 @@ const FilamentTable: React.FC = () => {
   const handleDeleteFilament = async (id: number) => {
     try {
       await axios.delete(`${apiUrl}/filaments/${id}`);
-      setFilaments(filaments.filter((filament) => filament.id !== id));
+      fetchFilaments();
     } catch (error) {
       console.error("Error deleting filament:", error);
     }
