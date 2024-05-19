@@ -14,8 +14,9 @@ import {
   Box,
 } from "@mui/material";
 import { Done, Clear, Edit, FilterList } from "@mui/icons-material";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { DataItem } from "../types";
+import statusColors from "./statusColors.json";
 
 interface OrderTableProps {
   data: DataItem[];
@@ -29,12 +30,12 @@ interface OrderTableProps {
 }
 
 const statusColor: { [key: string]: string } = {
-  Contact: "lightblue",
-  Order: "lightgreen",
-  Printing: "lightyellow",
-  Printed: "lightcoral",
-  Finished: "lightgray",
-  Sent: "lightsalmon",
+  Contact: statusColors.Contact,
+  Order: statusColors.Order,
+  Printing: statusColors.Printing,
+  Printed: statusColors.Printed,
+  Finished: statusColors.Finished,
+  Sent: statusColors.Sent,
 };
 
 const OrderTable: React.FC<OrderTableProps> = ({
