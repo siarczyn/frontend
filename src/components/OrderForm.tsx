@@ -63,6 +63,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
     nickname: "",
     description: "",
     price: 0,
+    filament_id: null,
+    amount_used: 0,
   };
 
   const [formState, setFormState] = useState<DataItem>(initialState);
@@ -130,7 +132,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
     e.preventDefault();
 
     try {
-      let updatedDescription = formState.description;
+      let updatedFormState = { ...formState };
 
       if (
         formState.status !== statusOptions[0] &&
@@ -146,14 +148,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
             amount_used: selectedFilamentData.amount_used + amountUsed,
           });
 
-          updatedDescription += ` Filament used: ${selectedFilamentData.material}:${selectedFilamentData.colour_name}:${selectedFilamentData.size} (Weight) - ${amountUsed}`;
+          updatedFormState = {
+            ...updatedFormState,
+            filament_id: selectedFilament,
+            amount_used: amountUsed,
+          };
         }
       }
-
-      const updatedFormState = {
-        ...formState,
-        description: updatedDescription,
-      };
 
       if (updatedFormState.id === 0) {
         const response = await axios.post(`${apiUrl}/data`, updatedFormState);
@@ -414,15 +415,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           )}
         </Box>
         <Box display="flex" justifyContent="space-between" mt={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            disabled={
-              formState.status !== statusOptions[0] &&
-              (!selectedFilament || !amountUsed)
-            }
-          >
+          <Button variant="contained" color="primary" type="submit">
             Save
           </Button>
           {formState.id !== 0 && (

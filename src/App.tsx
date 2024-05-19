@@ -103,6 +103,8 @@ const App: React.FC = () => {
       nickname: "",
       description: "",
       price: 0,
+      filament_id: null,
+      amount_used: 0,
     });
     navigate("/"); // Navigate to the home page
   };
@@ -148,10 +150,10 @@ const App: React.FC = () => {
     return filteredData()
       .slice()
       .sort((a, b) => {
-        if (b[orderBy] < a[orderBy]) {
+        if (!b[orderBy] < !a[orderBy]) {
           return order === "asc" ? -1 : 1;
         }
-        if (b[orderBy] > a[orderBy]) {
+        if (!b[orderBy] > !a[orderBy]) {
           return order === "asc" ? 1 : -1;
         }
         return 0;

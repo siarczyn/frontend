@@ -15,4 +15,6 @@ export interface DataItem {
   nickname: string;
   description: string;
   price: number;
+  filament_id: number | null;
+  amount_used: number;
 }

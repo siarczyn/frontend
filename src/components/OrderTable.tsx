@@ -14,7 +14,7 @@ import {
   Box,
 } from "@mui/material";
 import { Done, Clear, Edit, FilterList } from "@mui/icons-material";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { DataItem } from "../types";
 
 interface OrderTableProps {
@@ -59,6 +59,24 @@ const OrderTable: React.FC<OrderTableProps> = ({
   ) => {
     setFilter(filter === null ? true : filter === true ? false : null);
   };
+
+  const sortedData = [...data].sort((a, b) => {
+    if (orderBy === "date_of_order") {
+      const dateA = new Date(a.date_of_order).getTime();
+      const dateB = new Date(b.date_of_order).getTime();
+      console.log(a.date_of_order, b.date_of_order);
+      console.log(dateA, dateB);
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    } else if (orderBy === "price") {
+      return order === "asc" ? a.price - b.price : b.price - a.price;
+    } else {
+      const valueA = a[orderBy] as string | number;
+      const valueB = b[orderBy] as string | number;
+      if (valueA < valueB) return order === "asc" ? -1 : 1;
+      if (valueA > valueB) return order === "asc" ? 1 : -1;
+      return 0;
+    }
+  });
 
   return (
     <TableContainer
@@ -204,7 +222,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((item) => (
+          {sortedData.map((item) => (
             <TableRow
               key={item.id}
               sx={{ backgroundColor: statusColor[item.status] }}
@@ -216,7 +234,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
                   noWrap
                   align="center"
                 >
-                  {format(new Date(item.date_of_order), "dd-MM-yyyy")}
+                  {format(item.date_of_order, "dd-MM-yyyy")}
                 </Typography>
               </TableCell>
               <TableCell>

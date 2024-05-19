@@ -62,6 +62,16 @@ const OrderCard: React.FC<OrderCardProps> = ({ item, onEdit }) => {
         <Typography variant="body1">
           <strong>Description:</strong> {item.description}
         </Typography>
+        {item.filament_id && (
+          <Typography variant="body1">
+            <strong>Filament ID:</strong> {item.filament_id}
+          </Typography>
+        )}
+        {item.amount_used > 0 && (
+          <Typography variant="body1">
+            <strong>Amount Used:</strong> {item.amount_used}
+          </Typography>
+        )}
         <Box
           display="flex"
           justifyContent="flex-start"
