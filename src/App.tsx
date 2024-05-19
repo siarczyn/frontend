@@ -29,6 +29,7 @@ import FilterSortModal from "./components/FilterSortModal";
 import OrderTable from "./components/OrderTable";
 import ColourTable from "./components/ColourTable";
 import FilamentTable from "./components/FilamentTable";
+import FilamentUsageChart from "./components/FilamentUsageChart";
 import { DataItem } from "./types";
 
 const App: React.FC = () => {
@@ -204,8 +205,6 @@ const App: React.FC = () => {
         }}
       >
         <Routes>
-          <Route path="/colours" element={<ColourTable />} />
-          <Route path="/filaments" element={<FilamentTable />} />
           <Route
             path="/"
             element={
@@ -218,6 +217,7 @@ const App: React.FC = () => {
                 />
               ) : (
                 <>
+                  <FilamentUsageChart />
                   {loading ? (
                     <Box
                       display="flex"
@@ -274,6 +274,8 @@ const App: React.FC = () => {
               )
             }
           />
+          <Route path="/colours" element={<ColourTable />} />
+          <Route path="/filaments" element={<FilamentTable />} />
         </Routes>
         <Modal
           open={filterStatusModalOpen}
