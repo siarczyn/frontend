@@ -261,7 +261,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
                 <Tooltip title={item.description}>
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontSize: "70%" }}
+                    sx={{ fontSize: "70%", maxWidth: "100px" }}
                     noWrap
                   >
                     {item.description}

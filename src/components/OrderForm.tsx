@@ -16,10 +16,22 @@ import {
   DialogContentText,
   DialogTitle,
   useMediaQuery,
+  SelectChangeEvent,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { DataItem } from "../types";
 import theme from "../theme";
 import { colorOptions, paymentOptions, statusOptions } from "../options";
+
+interface Filament {
+  id: number;
+  size: number;
+  amount_used: number;
+  date_of_addition: string;
+  material: string;
+  colour_name: string;
+}
 
 interface OrderFormProps {
   order?: DataItem;
@@ -45,7 +57,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
     payment_status: "",
     discount: 0,
     date_of_order: new Date().toISOString().slice(0, 10),
-    status: "Contact", // Default status
+    status: statusOptions[0], // Default status
     payment_received: false,
     source_of_order: "",
     nickname: "",
@@ -54,6 +66,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
   };
 
   const [formState, setFormState] = useState<DataItem>(initialState);
+  const [filaments, setFilaments] = useState<Filament[]>([]);
+  const [selectedFilament, setSelectedFilament] = useState<number | "">("");
+  const [amountUsed, setAmountUsed] = useState<number | "">("");
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -62,6 +77,20 @@ const OrderForm: React.FC<OrderFormProps> = ({
       setFormState(order);
     }
   }, [order]);
+
+  useEffect(() => {
+    fetchFilaments();
+  }, []);
+
+  const fetchFilaments = async () => {
+    const apiUrl = process.env.REACT_APP_API_URL;
+    try {
+      const response = await axios.get(`${apiUrl}/filaments`);
+      setFilaments(response.data);
+    } catch (error) {
+      console.error("Error fetching filaments:", error);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -85,19 +114,47 @@ const OrderForm: React.FC<OrderFormProps> = ({
     }));
   };
 
+  const handleFilamentSelectChange = (
+    event: SelectChangeEvent<number | "">
+  ) => {
+    setSelectedFilament(event.target.value as number | "");
+  };
+
+  const handleAmountUsedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountUsed(parseFloat(e.target.value) || "");
+  };
+
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const adjustedPrice = formState.price * (1 - formState.discount / 100);
-
-    const updatedFormState = {
-      ...formState,
-      price: adjustedPrice,
-    };
-
     try {
+      let updatedDescription = formState.description;
+
+      if (
+        formState.status !== statusOptions[0] &&
+        selectedFilament &&
+        amountUsed
+      ) {
+        const selectedFilamentData = filaments.find(
+          (f) => f.id === selectedFilament
+        );
+        if (selectedFilamentData) {
+          await axios.put(`${apiUrl}/filaments/${selectedFilament}`, {
+            ...selectedFilamentData,
+            amount_used: selectedFilamentData.amount_used + amountUsed,
+          });
+
+          updatedDescription += ` Filament used: ${selectedFilamentData.material}:${selectedFilamentData.colour_name}:${selectedFilamentData.size} (Weight) - ${amountUsed}`;
+        }
+      }
+
+      const updatedFormState = {
+        ...formState,
+        description: updatedDescription,
+      };
+
       if (updatedFormState.id === 0) {
         const response = await axios.post(`${apiUrl}/data`, updatedFormState);
         onSave({ ...updatedFormState, id: response.data.id });
@@ -257,6 +314,16 @@ const OrderForm: React.FC<OrderFormProps> = ({
               ))}
             </Select>
           </FormControl>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formState.payment_received}
+                onChange={handleChange}
+                name="payment_received"
+              />
+            }
+            label="Payment Received"
+          />
           <TextField
             fullWidth={isMobile}
             margin="dense"
@@ -312,9 +379,50 @@ const OrderForm: React.FC<OrderFormProps> = ({
             rows={4}
             sx={{ flex: "1 1 100%" }}
           />
+          {formState.status !== statusOptions[0] && (
+            <>
+              <FormControl
+                fullWidth={isMobile}
+                margin="dense"
+                sx={{ flex: isMobile ? "1 1 100%" : "1 1 48%" }}
+              >
+                <InputLabel id="filament-label">Filament</InputLabel>
+                <Select
+                  labelId="filament-label"
+                  value={selectedFilament}
+                  onChange={handleFilamentSelectChange}
+                  label="Filament"
+                >
+                  {filaments.map((filament) => (
+                    <MenuItem key={filament.id} value={filament.id}>
+                      {`${filament.material}:${filament.colour_name}:${filament.size} (Weight) - ${filament.amount_used}`}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                fullWidth={isMobile}
+                margin="dense"
+                name="amount_used"
+                label="Amount Used"
+                type="number"
+                value={amountUsed}
+                onChange={handleAmountUsedChange}
+                sx={{ flex: isMobile ? "1 1 100%" : "1 1 48%" }}
+              />
+            </>
+          )}
         </Box>
         <Box display="flex" justifyContent="space-between" mt={2}>
-          <Button variant="contained" color="primary" type="submit">
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            disabled={
+              formState.status !== statusOptions[0] &&
+              (!selectedFilament || !amountUsed)
+            }
+          >
             Save
           </Button>
           {formState.id !== 0 && (
