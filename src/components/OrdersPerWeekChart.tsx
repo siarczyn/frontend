@@ -16,9 +16,9 @@ import {
   eachWeekOfInterval,
   format,
   getISOWeek,
-  isBefore,
   endOfToday,
 } from "date-fns";
+import { Box, Typography } from "@mui/material";
 
 interface Order {
   id: number;
@@ -80,34 +80,40 @@ const OrdersPerWeekChart: React.FC = () => {
   }, [orderData]);
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart
-        data={chartData}
-        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="week">
-          <Label value="Week" offset={-5} position="insideBottom" />
-        </XAxis>
-        <YAxis>
-          <Label
-            value="Orders"
-            angle={-90}
-            position="insideLeft"
-            style={{ textAnchor: "middle" }}
+    <Box width="100%" mb={4}>
+      <Typography variant="h6" gutterBottom>
+        Orders Per Week
+      </Typography>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="Week of year">
+            <Label value="Week" offset={-5} position="insideBottom" />
+          </XAxis>
+          <YAxis>
+            <Label
+              value="Orders"
+              angle={-90}
+              position="insideLeft"
+              style={{ textAnchor: "middle" }}
+            />
+          </YAxis>
+          <Tooltip />
+          <Legend verticalAlign="top" height={36} />
+          <Line
+            type="monotone"
+            dataKey="orders"
+            stroke="#8884d8"
+            strokeWidth={2}
+            dot={{ r: 4 }}
+            activeDot={{ r: 6 }}
           />
-        </YAxis>
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="orders"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={{ r: 4 }}
-          activeDot={{ r: 6 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+        </LineChart>
+      </ResponsiveContainer>
+    </Box>
   );
 };
 

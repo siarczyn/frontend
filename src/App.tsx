@@ -200,7 +200,7 @@ const App: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          width: isMobile ? "95vw" : "100vw",
+          width: "100%",
           minHeight: "100vw",
           pb: 5,
         }}
