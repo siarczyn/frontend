@@ -30,6 +30,7 @@ import OrderTable from "./components/OrderTable";
 import ColourTable from "./components/ColourTable";
 import FilamentTable from "./components/FilamentTable";
 import FilamentUsageChart from "./components/FilamentUsageChart";
+import OrdersPerWeekChart from "./components/OrdersPerWeekChart";
 import { DataItem } from "./types";
 
 const App: React.FC = () => {
@@ -208,70 +209,62 @@ const App: React.FC = () => {
           <Route
             path="/"
             element={
-              currentOrder ? (
-                <OrderForm
-                  order={currentOrder}
-                  onSave={handleSave}
-                  onCancel={handleCancel}
-                  onDelete={handleDelete}
-                />
-              ) : (
-                <>
-                  <FilamentUsageChart />
-                  {loading ? (
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      height="50vh"
-                    >
-                      <CircularProgress />
-                    </Box>
-                  ) : isMobile ? (
-                    <>
-                      {sortedData().map((item) => (
-                        <OrderCard
-                          key={item.id}
-                          item={item}
-                          onEdit={handleEdit}
-                        />
-                      ))}
-                      <Fab
-                        color="primary"
-                        aria-label="filter"
-                        sx={{ position: "fixed", bottom: 16, right: 16 }}
-                        onClick={() => setFilterSortModalOpen(true)}
-                      >
-                        <FilterList />
-                      </Fab>
-                      <FilterSortModal
-                        open={filterSortModalOpen}
-                        onClose={() => setFilterSortModalOpen(false)}
-                        filterStatus={filterStatus}
-                        filterPaymentReceived={filterPaymentReceived}
-                        setFilterStatus={setFilterStatus}
-                        setFilterPaymentReceived={setFilterPaymentReceived}
-                        orderBy={orderBy}
-                        setOrderBy={setOrderBy}
-                        order={order}
-                        setOrder={setOrder}
-                        clearFilters={clearFilters}
+              <>
+                <FilamentUsageChart />
+                <OrdersPerWeekChart />
+                {loading ? (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="50vh"
+                  >
+                    <CircularProgress />
+                  </Box>
+                ) : isMobile ? (
+                  <>
+                    {sortedData().map((item) => (
+                      <OrderCard
+                        key={item.id}
+                        item={item}
+                        onEdit={handleEdit}
                       />
-                    </>
-                  ) : (
-                    <OrderTable
-                      data={sortedData()}
-                      orderBy={orderBy}
-                      order={order}
-                      handleRequestSort={handleRequestSort}
-                      handleEdit={handleEdit}
-                      setFilterStatusModalOpen={setFilterStatusModalOpen}
+                    ))}
+                    <Fab
+                      color="primary"
+                      aria-label="filter"
+                      sx={{ position: "fixed", bottom: 16, right: 16 }}
+                      onClick={() => setFilterSortModalOpen(true)}
+                    >
+                      <FilterList />
+                    </Fab>
+                    <FilterSortModal
+                      open={filterSortModalOpen}
+                      onClose={() => setFilterSortModalOpen(false)}
+                      filterStatus={filterStatus}
                       filterPaymentReceived={filterPaymentReceived}
+                      setFilterStatus={setFilterStatus}
                       setFilterPaymentReceived={setFilterPaymentReceived}
+                      orderBy={orderBy}
+                      setOrderBy={setOrderBy}
+                      order={order}
+                      setOrder={setOrder}
+                      clearFilters={clearFilters}
                     />
-                  )}
-                </>
-              )
+                  </>
+                ) : (
+                  <OrderTable
+                    data={sortedData()}
+                    orderBy={orderBy}
+                    order={order}
+                    handleRequestSort={handleRequestSort}
+                    handleEdit={handleEdit}
+                    setFilterStatusModalOpen={setFilterStatusModalOpen}
+                    filterPaymentReceived={filterPaymentReceived}
+                    setFilterPaymentReceived={setFilterPaymentReceived}
+                  />
+                )}
+              </>
             }
           />
           <Route path="/colours" element={<ColourTable />} />
