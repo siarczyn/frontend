@@ -11,13 +11,7 @@ import {
   Legend,
   Label,
 } from "recharts";
-import {
-  startOfYear,
-  eachWeekOfInterval,
-  format,
-  getISOWeek,
-  endOfToday,
-} from "date-fns";
+import { startOfYear, eachWeekOfInterval, format, endOfToday } from "date-fns";
 import { Box, Typography } from "@mui/material";
 
 interface Order {
@@ -60,7 +54,6 @@ const OrdersPerWeekChart: React.FC = () => {
       });
 
       const ordersPerWeek = weeks.map((weekStart) => {
-        const weekNumber = getISOWeek(weekStart);
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
 
