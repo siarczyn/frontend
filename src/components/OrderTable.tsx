@@ -65,8 +65,6 @@ const OrderTable: React.FC<OrderTableProps> = ({
     if (orderBy === "date_of_order") {
       const dateA = new Date(a.date_of_order).getTime();
       const dateB = new Date(b.date_of_order).getTime();
-      console.log(a.date_of_order, b.date_of_order);
-      console.log(dateA, dateB);
       return order === "asc" ? dateA - dateB : dateB - dateA;
     } else if (orderBy === "price") {
       return order === "asc" ? a.price - b.price : b.price - a.price;
