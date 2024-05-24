@@ -209,6 +209,14 @@ const App: React.FC = () => {
           <Route
             path="/"
             element={
+              currentOrder ? (
+                <OrderForm
+                  order={currentOrder}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                  onDelete={handleDelete}
+                />
+              ) : 
               <>
                 <FilamentUsageChart />
                 <OrdersPerWeekChart />
